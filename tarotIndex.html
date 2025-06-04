@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+				<title>Tarot Card Reading</title>
+				<style>
+                   body { 
+				    text-align: center;
+					font-family: Arial, sans-serif;
+					}
+                   canvas {
+				   border: 1px solid black;
+				   }
+                   button {
+				   padding: 10px;
+				   margin-top: 10px;
+				   }
+				   .tooltip-container { 
+				     position: relative;
+					 display: inline-block;
+					 }
+                   .tooltip {
+                     position: absolute;
+                     background-color: black;
+                      color: white;
+                     padding: 8px;
+                     border-radius: 5px;
+                     font-size: 14px;
+                     visibility: hidden;
+                     white-space: nowrap;
+					 }
+                </style>
+			</head>
+			<body>
+	   <h1>Tarot Card Reading</h1>
+    <div class="tooltip-container">
+        <canvas id="tarotCanvas" width="300" height="500"></canvas> 
+        <div id="tooltip" class="tooltip"></div> 
+    </div>
+    <br>
+    <button onclick="drawCard()">Draw a Card</button>
+					<script>
+                       const tarotDeck = [
+                       { id: 1, name: "The Fool", image: "tarotImg/major/theFool.png" },
+                       { id: 2, name: "The Magician", image: "tarotImg/major/theMagician.png" },
+                       { id: 3, name: "The High Priestess", image: "tarotImg/major/theHighPriestess.png" },
+					   { id: 7, name: "The Lovers", image: "tarotImg/major/theLovers.png" },
+                       { id: 8, name: "The Chariot", image: "tarotImg/major/theChariot.png" },
+                       { id: 9, name: "Strength", image: "tarotImg/major/strength.png" },
+                       { id: 10, name: "The Hermit", image: "tarotImg/major/theHermit.png" } ,
+                       { id: 11, name: "Wheel of Fortune", image: "tarotImg/major/wheelOfFortune.png" },
+                       { id: 12, name: "Justice", image: "tarotImg/major/justice.png" },
+                       { id: 13, name: "The Hanged Man", image: "tarotImg/major/theHangedMan.png" },
+                       { id: 14, name: "Death", image: "tarotImg/major/death.png" },
+                       { id: 15, name: "Temperance", image: "tarotImg/major/temperance.png" },
+                       { id: 16, name: "The Devil", image: "tarotImg/major/theDevil.png" },
+                       { id: 17, name: "The Tower", image: "tarotImg/major/theTower.png" },
+                       { id: 18, name: "The Star", image: "tarotImg/major/theStar.png" },
+                       { id: 19, name: "The Moon", image: "tarotImg/major/theMoon.png" },
+                       { id: 20, name: "The Sun", image: "tarotImg/major/theSun.png" },
+                       { id: 21, name: "Judgement", image: "tarotImg/major/judgement.png" },
+                       { id: 22, name: "The World", image: "tarotImg/major/theWorld.png" },
+					   { id: 23, name: "Two of Coins", image: "tarotImg/minor/2coins.png" },
+                       { id: 24, name: "Three of Coins", image: "tarotImg/minor/3coins.png" },
+                       { id: 25, name: "Four of Coins", image: "tarotImg/minor/4coins.png" },
+                       { id: 26, name: "Five of Coins", image: "tarotImg/minor/5coins.png" },
+                       { id: 27, name: "Six oof Coins", image: "tarotImg/minor/6coins.png" },
+                       { id: 28, name: "Seven of Coins", image: "tarotImg/minor/7coins.png" },
+                       { id: 29, name: "Eight of Coins", image: "tarotImg/minor/8coins.png" },
+                       { id: 30, name: "Nine of Coins", image: "tarotImg/minor/9coins.png" },
+                       { id: 31, name: "Ten of Coins", image: "tarotImg/minor/10coins.png" },
+                       { id: 32, name: "Ace of Coins", image: "tarotImg/minor/aceCoins.png" },
+                       { id: 33, name: "Page of Coins", image: "tarotImg/minor/pageCoins.png" },
+                       { id: 34, name: "Knight of Coins", image: "tarotImg/minor/knightCoins.png" },
+                       { id: 35, name: "Queen of Coins", image: "tarotImg/minor/queenCoins.png" },
+                       { id: 36, name: "King of Coins", image: "tarotImg/minor/kingCoins.png" },
+					   { id: 37, name: "Two of Cups", image: "tarotImg/minor/2cups.png" },
+                       { id: 38, name: "Three of Cups", image: "tarotImg/minor/3cups.png" },
+                       { id: 39, name: "Four of Cups", image: "tarotImg/minor/4cups.png" },
+                       { id: 40, name: "Five of Cups", image: "tarotImg/minor/5cups.png" },
+                       { id: 41, name: "Six of Cups", image: "tarotImg/minor/6cups.png" },
+                       { id: 42, name: "Seven of Cups", image: "tarotImg/minor/7cups.png" },
+                       { id: 43, name: "Eight of Cups", image: "tarotImg/minor/8cups.png" },
+                       { id: 44, name: "Nine of Cups", image: "tarotImg/minor/9cups.png" },
+                       { id: 45, name: "Ten of Cups", image: "tarotImg/minor/10cups.png" },
+                       { id: 46, name: "Ace of Cups", image: "tarotImg/minor/aceCups.png" },
+                       { id: 47, name: "Page of Cups", image: "tarotImg/minor/pageCups.png" },
+                       { id: 48, name: "Knight of Cups", image: "tarotImg/minor/knightCups.png" },
+                       { id: 49, name: "Queen of Cups", image: "tarotImg/minor/queenCups.png" },
+                       { id: 50, name: "King of Cups", image: "tarotImg/minor/kingCups.png" },
+                       { id: 51,name: "Two of Swords", image: "tarotImg/minor/2swords.png" },
+                       { id: 52, name: "Three of Swords", image: "tarotImg/minor/3swords.png" },
+                       { id: 53, name: "Four of Swords", image: "tarotImg/minor/4swords.png" },
+                       { id: 54, name: "Five of Swords", image: "tarotImg/minor/5swords.png" },
+                       { id: 55, name: "Six of Swords", image: "tarotImg/minor/6swords.png" },
+                       { id: 56, name: "Seven of Swords", image: "tarotImg/minor/7swords.png" },
+                       { id: 57, name: "Eight of Swords", image: "tarotImg/minor/8swords.png" },
+                       { id: 58, name: "Nine of Swords", image: "tarotImg/minor/9swords.png" },
+                       { id: 59, name: "Ten of Swords", image: "tarotImg/minor/10swords.png" },
+                       { id: 60, name: "Ace of Swords", image: "tarotImg/minor/aceSwords.png" },
+                       { id: 61, name: "Page of Swords", image: "tarotImg/minor/pageSwords.png" },
+                       { id: 62, name: "Knight of Swords", image: "tarotImg/minor/knightSwords.png" },
+                       { id: 63, name: "Queen of Swords", image: "tarotImg/minor/queenSwords.png" },
+                       { id: 64, name: "King of Swords", image: "tarotImg/minor/kingSwords.png" },
+                       { id: 65, name: "Two of Wands", image: "tarotImg/minor/2wands.png" },
+                       { id: 66, name: "Three of Wands", image: "tarotImg/minor/3wands.png" },
+                       { id: 67, name: "Four of Wands", image: "tarotImg/minor/4wands.png" },
+                       { id: 68, name: "Five of Wands", image: "tarotImg/minor/5wands.png" },
+                       { id: 69, name: "Six of Wands", image: "tarotImg/minor/6wands.png" },
+                       { id: 70, name: "Seven of Wands", image: "tarotImg/minor/7wands.png" },
+                       { id: 71, name: "Eight of Wands", image: "tarotImg/minor/8wands.png" },
+                       { id: 72, name: "Nine of Wands", image: "tarotImg/minor/9wands.png" },
+                       { id: 73, name: "Ten of Wands", image: "tarotImg/minor/10wands.png" },
+                       { id: 74, name: "Ace of Wands", image: "tarotImg/minor/aceWands.png" },
+                       { id: 75, name: "Page of Wands", image: "tarotImg/minor/pageWands.png" },
+                       { id: 76, name: "Knight of Wands", image: "tarotImg/minor/knightWands.png" },
+                       { id: 77, name: "Queen of Wands", image: "tarotImg/minor/queenWands.png" },
+                       { id: 78, name: "King of Wands", image: "tarotImg/minor/kingWands.png" },
+                        ];
+						
+        let selectedCard;
+
+        function getRandomInt(min, max) {
+            min = Math.ceil(min);
+            max = Math.floor(max);
+            return Math.floor(Math.random() * (max - min + 1) + min);
+        }
+
+        const canvas = document.getElementById("tarotCanvas");
+        const tooltip = document.getElementById("tooltip");
+
+        canvas.addEventListener("mousemove", (event) => {
+            if (selectedCard) {
+                tooltip.innerText = getCardMeaning(selectedCard.name); // Ensure this function is defined
+                tooltip.style.left = `${event.pageX + 10}px`; // Position near cursor
+                tooltip.style.top = `${event.pageY + 10}px`;
+                tooltip.style.visibility = "visible";
+            }
+        });
+
+        canvas.addEventListener("mouseleave", () => {
+            tooltip.style.visibility = "hidden";
+        });
+
+        function drawCard() {
+            let cardID = getRandomInt(0, tarotDeck.length - 1);
+            selectedCard = tarotDeck[cardID]; // Use the higher scoped variable
+
+            let ctx = canvas.getContext("2d");
+
+            let img = new Image();
+            img.src = selectedCard.image;
+
+            img.onload = function () {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "black";
+                ctx.font = "20px Arial";
+                ctx.fillText(selectedCard.name, 10, canvas.height - 20);
+            };
+        }
+
+        // Define the getCardMeaning function or remove the reference
+        function getCardMeaning(cardName) {
+            // Example meanings, replace with actual meanings
+            const meanings = {
+                "The Fool": "New beginnings, adventure, spontaneity.",
+                "The Magician": "Manifestation, resourcefulness, power.",
+                "The High Priestess": "Intuition, unconscious knowledge, mystery."
+                // Add meanings for all cards
+            };
+            return meanings[cardName] || "Meaning not found.";
+        }
+		
+    </script>
+</body>
+</html>
